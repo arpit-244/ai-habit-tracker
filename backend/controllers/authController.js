@@ -3,22 +3,23 @@ import User from "../models/user.js"
 
 const signToken=(id)=>
     jwt.sign({id},process.env.JWT_SECRET,{
-        expiredIN:process.env.JWT_EXPIRES_IN |"30d",
+        expiresIn:process.env.JWT_EXPIRES_IN ||"30d",
     });
 
 export const register =async(req,res)=>{
     try{
+    const { name, email, password } = req.body;    
     if(!name ||!email ||!password){
-        return res.status(400).json({messgae:"Name, email and password are required"})
+        return res.status(400).json({message:"Name, email and password are required"})
 
-        if(password.length<6){
+    }
+    if(password.length<6){
             return res.status(400).json({message:"Password must be at least 6 characters"})
 
-        }
     }
-    const exists=await User.findOne({email:email.toLowerCase()})
+    const exists=await User.findOne({email:email.toLowerCase()});
     if(exists){
-        return res.status(400).jsom({message:"User already exists"})
+        return res.status(400).json({message:"User already exists"})
     }
 
     const user=await User.create({
@@ -61,6 +62,11 @@ export const updateProfile=async (req,res)=>{
     try{
         const {name,morningMotivation}=req.body;
         const user= await User.findById(req.user._id)
+        if(!user){
+            return res.status(404).json({
+                message:"User not found"
+            });
+        }                
         if(name!==undefined){
             user.name=name;
             user.avatar=name.charAt(0).toUpperCase()
