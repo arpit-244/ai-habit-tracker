@@ -39,7 +39,7 @@ export const lastNDays = (n) => {
 };
 
 export const calcStreak = (sortedDateKeys) => {
-  // sortedDateKeys: newest first, unique
+  // sortedDateKeys-newest first, unique
 
   if (!sortedDateKeys.length) {
     return {
