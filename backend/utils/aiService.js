@@ -31,7 +31,7 @@ export const parseJSON = (text) => {
   return JSON.parse(cleaned.trim());
 };
 
-export const chatCompletion= async ({system,user,temprature=0.7})=>{
+export const chatCompletion= async ({system,user,temperature=0.7})=>{
     const c=getClient();
     if(!c){
         return {
@@ -40,11 +40,12 @@ export const chatCompletion= async ({system,user,temprature=0.7})=>{
         };
     }
     try{
+        
         const res=await c.models.generateContent({
             model:MODEL,
             contents:user,
             config:{
-                systemInstructions:system,
+                systemInstruction:system,
                 temperature
             }
         });
@@ -64,24 +65,29 @@ export const chatCompletion= async ({system,user,temprature=0.7})=>{
 };
 
 export const SYSTEM_PROMPTS = {
-  weekly: `
+weekly: `
 You are a warm, encouraging habit coach.
 
-Analyse the user's last 7 days of habit data and write a short personalised report (120-180 words).
+Analyse the user's last 7 days of habit data and write a personalised weekly report.
 
-Mention:
-- What went well
-- What habits struggled
-- Any patterns you notice
-- One specific piece of encouragement
+Requirements:
+- 120 to 180 words only
+- Use the user's actual habit names
+- Mention:
+  - what went well
+  - what struggled
+  - one pattern you noticed
+  - one specific encouragement
+- Sound human and supportive
+- Be concise and insightful
+- Do NOT use markdown
+- Do NOT use headings
+- Do NOT use bullet points
+- Do NOT use numbered lists
+- Do NOT give long action plans
+- Write as plain prose with natural line breaks
 
-Use the user's actual habit names whenever possible.
-
-Be supportive, human, and specific. Avoid generic advice.
-
-Do not use markdown headers, bullet points, or numbered lists.
-
-Write in plain prose with natural line breaks.
+Focus on reflection rather than advice.
 `,
 
   suggestion: `
