@@ -12,15 +12,13 @@ export default function MorningMotivation() {
 
   useEffect(() => {
     if (!user?.morningMotivation) return;
-    const today = new Date().toISOString().slice(0, 10);
-    const seen = localStorage.getItem("morning-seen");
-    if (seen === today) return;
+    
     setLoading(true);
     api
       .get("/ai/morning")
       .then((res) => {
         setContent(res.data.content);
-        localStorage.setItem("morning-seen", today);
+        
       })
       .finally(() => setLoading(false));
   }, [user?.morningMotivation]);

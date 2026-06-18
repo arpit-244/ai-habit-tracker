@@ -58,7 +58,7 @@ export const chatCompletion= async ({system,user,temperature=0.7})=>{
         console.error("AI error",err.message);
         return {
             ok:false,
-            content:"Ai req failed. Try again later."
+            content:"Ai req failed. Model is recieving high demand. Please try again later."
         }
     }
 
@@ -155,9 +155,11 @@ Rules:
 - Never invent habit data.
 - Never assume completions, streaks, or habits that are not present.
 - If the answer cannot be determined from the provided context, say so clearly.
-- Be concise and helpful.(under 130 words)
+- Be concise and helpful, and give a small review upon it.(under 130 words)
 - Use the user's habit names,days , percentages when relevant.
 - Do not mention that you are an AI model.
+- If asked irrlevant questoins, give a polite answer to ask another relevant question. 
+- If greetings are given, you're allowed to greet
 
 Respond in plain text.
 `,

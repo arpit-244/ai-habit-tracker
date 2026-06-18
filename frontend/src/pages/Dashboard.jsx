@@ -79,9 +79,18 @@ export default function Dashboard() {
   }, []);
 
   const completedToday = useMemo(
-    () => new Set(todayLogs.map((l) => String(l.habitId))),
-    [todayLogs]
-  );
+  () =>
+    new Set(
+      todayLogs
+        .filter((l) =>
+          habits.some(
+            (h) => String(h._id) === String(l.habitId)
+          )
+        )
+        .map((l) => String(l.habitId))
+    ),
+  [todayLogs, habits]
+);
 
   const weekLogsByHabit = useMemo(() => {
     const out = {};
@@ -113,8 +122,8 @@ export default function Dashboard() {
   );
 
   const weekTotal = habits.length * 7;
-  const weekDone = Object.values(weekLogsByHabit).reduce(
-    (s, arr) => s + arr.length,
+  const weekDone = habits.reduce(
+    (sum, h) => sum + (weekLogsByHabit[h._id]?.length || 0),
     0
   );
   const weekRate = weekTotal ? Math.round((weekDone / weekTotal) * 100) : 0;
@@ -146,6 +155,15 @@ export default function Dashboard() {
       setTodayLogs((logs) =>
         logs.filter((l) => String(l.habitId) !== String(habit._id))
       );
+      setWeekLogs((logs) =>
+  logs.filter(
+    (l) =>
+      !(
+        String(l.habitId) === String(habit._id) &&
+        l.completedDate === today
+      )
+  )
+);
       setAllLogsByHabit((prev) => {
         const next = { ...prev };
         next[habit._id] = (next[habit._id] || []).filter((d) => d !== today);
@@ -154,6 +172,7 @@ export default function Dashboard() {
     } else {
       const res = await api.post("/logs", { habitId: habit._id, date: today });
       setTodayLogs((logs) => [...logs, res.data]);
+      setWeekLogs((logs) => [...logs, res.data]);
       setAllLogsByHabit((prev) => {
         const next = { ...prev };
         next[habit._id] = [today, ...(next[habit._id] || [])];

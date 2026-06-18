@@ -326,11 +326,29 @@ If the information is insufficient, say so clearly.
 
 
 export const morningMotivation =async(req, res)=>{
+  
     try{
-        const habits=await Habit.find({
-            userId: req.user._id,
-            isArchived:false
-        });
+
+        const todayKeyStr = todayKey();
+
+    const existing = await AIInsight.findOne({
+      userId: req.user._id,
+      type: "morning",
+    }).sort({ createdAt: -1 });
+
+    if (
+      existing &&
+      existing.createdAt.toISOString().slice(0, 10) === todayKeyStr
+    ) {
+      return res.json({
+        content: existing.content,
+      });
+    }
+
+    const habits = await Habit.find({
+      userId: req.user._id,
+      isArchived: false,
+    });
         if(!habits.length){
             return res.json({
                 content:"Good Morning! Add your first habit today and let's get the momentum started.",
@@ -381,7 +399,7 @@ Requirements:
      const {content}=await chatCompletion({
         system:SYSTEM_PROMPTS.morning,
         user:userMsg,
-        temprature:0.8
+        temperature:0.8
      });
 
      await AIInsight.create({
